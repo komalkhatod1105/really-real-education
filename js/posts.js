@@ -44,10 +44,10 @@
     return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(post.image)}`;
   }
 
-  // X embeds a direct image URL as a photo card automatically.
+  // X shares the post URL; the preview image comes from twitter:card meta tags on posts.html.
   function getXShareUrl(post) {
-    const text = `${post.title}\n\nReally Real Education — Jalte Diye Foundation\n${getPostUrl(post.id)}`;
-    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(post.image)}`;
+    const text = `${post.title}\n\nReally Real Education — Jalte Diye Foundation`;
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(getPostUrl(post.id))}`;
   }
 
   // Facebook scrapes the image URL directly and shows it as a photo preview.
