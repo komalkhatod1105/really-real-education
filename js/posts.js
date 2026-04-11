@@ -9,7 +9,9 @@
       title: "Daily Quote 101",
       date: "2026-04-11",
       excerpt: "Daily learning quote post #101.",
-      image: "https://raw.githubusercontent.com/Jalte-Diye-Foundation/Cogentic/main/Background1/quote_101.jpg"
+      image: "https://raw.githubusercontent.com/Jalte-Diye-Foundation/Cogentic/main/Background1/quote_101.jpg",
+      imageNumber: 101,
+      permalink: "https://reallyrealeducation.org/posts/post-2026-04-11.html"
     }
   ];
 
@@ -36,12 +38,16 @@
   }
 
   function getPostUrl(postId) {
-    return `${window.location.origin}${window.location.pathname}#${postId}`;
+    return `${window.location.origin}/posts/${postId}.html`;
+  }
+
+  function getResolvedPostUrl(post) {
+    return post.permalink || getPostUrl(post.id);
   }
 
   // LinkedIn previews are best when sharing the page URL with OG tags.
   function getLinkedInShareUrl(post) {
-    return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getPostUrl(post.id))}`;
+    return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getResolvedPostUrl(post))}`;
   }
 
   function getQuoteNumber(post) {
@@ -63,18 +69,19 @@
   // X shares the post URL; the preview image comes from twitter:card meta tags on posts.html.
   function getXShareUrl(post) {
     const text = createQuoteMessage(post);
-    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(getPostUrl(post.id))}`;
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(getResolvedPostUrl(post))}`;
   }
 
-  // Facebook scrapes the image URL directly and shows it as a photo preview.
+  // Facebook sharing works more reliably with a page URL that has OG tags than a raw image URL.
   function getFacebookShareUrl(post) {
-    return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(post.image)}`;
+    return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getResolvedPostUrl(post))}`;
   }
 
   // Instagram and YouTube: copy image URL first so it's easy to attach, then the caption.
   function createCaption(post) {
     const postUrl = getPostUrl(post.id);
-    return `${post.image}\n\n${post.title}\n${post.excerpt}\n\nReally Real Education — Jalte Diye Foundation\n${postUrl}`;
+    const resolvedPostUrl = getResolvedPostUrl(post);
+    return `${post.image}\n\n${post.title}\n${post.excerpt}\n\nReally Real Education — Jalte Diye Foundation\n${resolvedPostUrl}`;
   }
 
   // Update Open Graph and Twitter Card meta tags so the page preview shows today's image
@@ -87,7 +94,7 @@
     set("og-title", `${post.title} — Really Real Education`);
     set("og-description", post.excerpt || "Daily learning quote from Really Real Education.");
     set("og-image", post.image);
-    set("og-url", getPostUrl(post.id));
+    set("og-url", getResolvedPostUrl(post));
     set("tw-title", `${post.title} — Really Real Education`);
     set("tw-description", post.excerpt || "Daily learning quote from Really Real Education.");
     set("tw-image", post.image);
@@ -108,8 +115,46 @@
     return Promise.resolve();
   }
 
-  function onManualShare(platform, post) {
+  async function tryNativeImageShare(post) {
+    if (!navigator.share || !navigator.canShare) {
+      return false;
+    }
+
+    const response = await fetch(post.image);
+    if (!response.ok) {
+      return false;
+    }
+
+    const mimeType = response.headers.get("content-type") || "image/jpeg";
+    const imageBlob = await response.blob();
+    const quoteNumber = String(getQuoteNumber(post) || "image");
+    const imageFile = new File([imageBlob], `quote-${quoteNumber}.jpg`, { type: mimeType });
+
+    if (!navigator.canShare({ files: [imageFile] })) {
+      return false;
+    }
+
+    await navigator.share({
+      files: [imageFile],
+      text: `${createQuoteMessage(post)}\n\n${getResolvedPostUrl(post)}`
+    });
+    return true;
+  }
+
+  async function onManualShare(platform, post) {
     const caption = createCaption(post);
+
+    if (platform === "Instagram" || platform === "YouTube") {
+      try {
+        const shared = await tryNativeImageShare(post);
+        if (shared) {
+          return;
+        }
+      } catch {
+        // Fall back to copy-and-open flow below when native share is unavailable.
+      }
+    }
+
     copyTextToClipboard(caption)
       .then(() => {
         alert(`Caption copied. Paste it on ${platform}.`);
@@ -125,7 +170,7 @@
   }
 
   function onLinkedInShare(post) {
-    const caption = `${createQuoteMessage(post)}\n\n${getPostUrl(post.id)}`;
+    const caption = `${createQuoteMessage(post)}\n\n${getResolvedPostUrl(post)}`;
     copyTextToClipboard(caption)
       .then(() => {
         alert("Caption copied. Paste it in LinkedIn after the preview loads.");
@@ -154,6 +199,8 @@
             <img class="post-image" src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" loading="lazy">
             <div class="post-body">
               <h2 class="post-title"><strong>Daily Quote</strong></h2>
+              <p class="card-meta"><strong>Daily Quote ${escapeHtml(String(getQuoteNumber(post)))}</strong></p>
+              <p class="card-meta">Last updated: ${escapeHtml(formatDate(post.date))}</p>
               <p>${escapeHtml(post.excerpt)}</p>
               <div class="post-actions">
                 <button class="btn linkedin-share" type="button" data-post-id="${escapeHtml(post.id)}">Share on LinkedIn</button>

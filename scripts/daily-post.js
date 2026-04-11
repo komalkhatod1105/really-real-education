@@ -41,7 +41,7 @@ function createPost(today, imageNumber) {
     excerpt: `Daily learning quote post #${padded}.`,
     image: "",
     imageNumber,
-    permalink: `${SITE_URL}/posts.html#${id}`
+    permalink: `${SITE_URL}/posts/${id}.html`
   };
 }
 

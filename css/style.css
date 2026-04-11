@@ -352,7 +352,12 @@ a {
   padding: 12px 22px;
   border-radius: 999px;
   border: none;
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  appearance: none;
   background: linear-gradient(135deg, rgba(102, 183, 160, 0.95), rgba(183, 102, 125, 0.95));
   color: #ffffff;
   cursor: pointer;

@@ -33,7 +33,7 @@ function main() {
   }
 
   const latest = posts[0];
-  const postUrl = latest.permalink || `${SITE_URL}/posts.html#${latest.id}`;
+  const postUrl = latest.permalink || `${SITE_URL}/posts/${latest.id}.html`;
   const title = `${latest.title} — Really Real Education`;
   const description = latest.excerpt || "Daily learning quote from Really Real Education by Jalte Diye Foundation.";
 

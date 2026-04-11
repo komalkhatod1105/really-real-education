@@ -36,7 +36,7 @@ function isAlreadyPosted(state, post) {
 
 function buildShareText(post) {
   const quoteNumber = post.imageNumber || (post.title.match(/(\d+)/)?.[1] || "");
-  const postUrl = post.permalink || `https://reallyrealeducation.org/posts.html#${post.id}`;
+  const postUrl = post.permalink || `https://reallyrealeducation.org/posts/${post.id}.html`;
 
   return [
     `Quote ${quoteNumber}`,

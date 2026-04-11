@@ -26,7 +26,7 @@ function readPosts() {
 function buildRss(posts) {
   const items = posts
     .map((post) => {
-      const link = post.permalink || `${SITE_URL}/posts.html#${post.id}`;
+      const link = post.permalink || `${SITE_URL}/posts/${post.id}.html`;
       const description = `${post.excerpt || ""} <img src="${post.image}" alt="${post.title}">`;
       return [
         "    <item>",
