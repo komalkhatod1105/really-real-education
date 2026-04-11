@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>Really Real Education Daily Posts</title>
     <link>https://reallyrealeducation.org/posts.html</link>
     <description>Automated daily quote posts feed.</description>
     <item>
-      <title>Daily Quote 001</title>
-      <link>https://reallyrealeducation.org/posts.html#post-2026-04-10</link>
-      <guid>https://reallyrealeducation.org/posts.html#post-2026-04-10</guid>
-      <pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate>
-      <description>Daily learning quote post #001.</description>
+      <title>Daily Quote 101</title>
+      <link>https://reallyrealeducation.org/posts.html#post-2026-04-11</link>
+      <guid>https://reallyrealeducation.org/posts.html#post-2026-04-11</guid>
+      <pubDate>Sat, 11 Apr 2026 00:00:00 GMT</pubDate>
+      <description><![CDATA[Daily learning quote post #101. <img src="https://raw.githubusercontent.com/Jalte-Diye-Foundation/Cogentic/main/Background1/quote_101.jpg" alt="Daily Quote 101">]]></description>
+      <enclosure url="https://raw.githubusercontent.com/Jalte-Diye-Foundation/Cogentic/main/Background1/quote_101.jpg" length="0" type="image/jpeg"/>
+      <media:content url="https://raw.githubusercontent.com/Jalte-Diye-Foundation/Cogentic/main/Background1/quote_101.jpg" medium="image" type="image/jpeg"/>
     </item>
   </channel>
 </rss>
