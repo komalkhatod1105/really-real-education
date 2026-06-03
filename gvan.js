@@ -37,9 +37,8 @@
     let rainfallScore = Math.min(1, mm/2000);
     let soilScore = (S.soil.includes("Clay")||S.soil.includes("Alluvial")) ? 0.85 : (S.soil.includes("Sandy") ? 0.6 : 0.7);
     let waterScore = parseFloat(document.getElementById("waterAvail").value) || 0.75;
-    let elevationScore = (parseFloat(document.getElementById("elevation").value) || 320) < 800 ? 1 : 0.7;
     let phScore = getPHScore(parseFloat(document.getElementById("soilPH").value) || 6.5);
-    let siteSuitability = (climateScore*0.25 + rainfallScore*0.2 + soilScore*0.2 + waterScore*0.2 + elevationScore*0.1 + phScore*0.05);
+    let siteSuitability = (climateScore*0.25 + rainfallScore*0.25 + soilScore*0.25 + waterScore*0.20 + phScore*0.05);
     
     // Goal alignment
     let goal = document.getElementById("goal").value;
@@ -66,11 +65,6 @@
     let maintLevel = document.getElementById("maintenance").value;
     let maintScore = maintLevel === "high" ? 1.0 : (maintLevel === "medium" ? 0.7 : 0.4);
     
-    // Budget adequacy
-    let budget = parseFloat(document.getElementById("budget").value) || 500000;
-    let fiveYrCost = parseFloat(document.getElementById("mCost").innerText.replace(/[^0-9.-]/g, '')) || 0;
-    let budgetScore = Math.min(1, budget / (fiveYrCost || 1));
-    
     // Spacing appropriateness
     let spacing = parseFloat(document.getElementById("spacing").value) || 3;
     let spacingScore = 1.0;
@@ -80,10 +74,9 @@
     if(goal === "mixed" && (spacing < 2.5 || spacing > 5)) spacingScore = 0.7;
     
     // Weighted sum
-    let successRate = (siteSuitability * 0.50) +
-                      (goalScore * 0.15) +
-                      (maintScore * 0.10) +
-                      (budgetScore * 0.15) +
+    let successRate = (siteSuitability * 0.55) +
+                      (goalScore * 0.20) +
+                      (maintScore * 0.15) +
                       (spacingScore * 0.10);
     return Math.min(1, Math.max(0, successRate));
   }
@@ -244,7 +237,6 @@
     const rainfall = parseInt(S.rainfall) || 900;
     const waterAvail = parseFloat(document.getElementById("waterAvail").value) || 0.75;
     const ph = parseFloat(document.getElementById("soilPH").value) || 6.5;
-    const elevation = parseFloat(document.getElementById("elevation").value) || 300;
     const spacing = parseFloat(document.getElementById("spacing").value) || 3;
     const soilType = S.soil;
     
@@ -254,7 +246,6 @@
     else if(climate.includes("Subtropical")) zone = "subtropical";
     else if(climate.includes("Temperate")) zone = "temperate";
     if(rainfall < 600) zone = "arid";
-    if(elevation > 1500) zone = "temperate";
     if(waterAvail < 0.35) zone = "arid";
     
     const speciesMap = {
@@ -365,14 +356,13 @@
     for(let r of recs) {
       html += `<div class="species-rec-card"><strong>🌱 ${r.name}</strong><br><span style="font-size:0.8rem;color:var(--ink-mid);">${r.reason}</span></div>`;
     }
-    html += `</div><p style="margin-top:0.8rem;font-size:0.7rem;">👉 Recommendations strongly influenced by soil pH, climate, rainfall, water, elevation, goal, and spacing.</p>`;
+    html += `</div><p style="margin-top:0.8rem;font-size:0.7rem;">👉 Recommendations strongly influenced by soil pH, climate, rainfall, water, goal, and spacing.</p>`;
     document.getElementById("speciesRecBody").innerHTML = html;
   }
   
   function updateSuggestions() {
     let wA = parseFloat(document.getElementById("waterAvail").value);
     let mm = parseInt(S.rainfall) || 900;
-    let budget = parseFloat(document.getElementById("budget").value);
     let fiveYrCost = parseFloat(document.getElementById("mCost").innerText.replace(/[^0-9.-]/g, '')) || 0;
     let ph = parseFloat(document.getElementById("soilPH").value);
     let soilScore = (S.soil.includes("Clay")||S.soil.includes("Alluvial")) ? 0.85 : 0.65;
@@ -381,7 +371,6 @@
     let suggestions = [];
     if(wA < 0.4) suggestions.push("💧 Water shortage: Dig farm ponds, use drip irrigation, plant drought‑tolerant trees like Neem, Khejri, Ber.");
     if(mm < 700) suggestions.push("☀️ Low rainfall: Mulch heavily, plant after monsoon, choose Acacia, Prosopis, Custard Apple.");
-    if(budget < fiveYrCost) suggestions.push("💰 Budget shortfall: Apply for NAP, CAMPA, or SMAF subsidy at your local Agriculture Office or Forest Department.");
     if(soilScore < 0.5) suggestions.push("🌱 Poor soil: Add farmyard manure or compost. Grow green manure crops before planting.");
     if(ph < 5.5) suggestions.push(`🧪 ${phAdvice} Recommended: Mix wood ash (2-3 kg/10 sq m) or agricultural lime. Get soil test from KVK.`);
     if(ph > 8) suggestions.push(`🧪 ${phAdvice} Recommended: Add lots of compost (5-10 kg/sq m) or sulphur (1-2 kg/10 sq m).`);
@@ -417,11 +406,9 @@
     let area = unit==="ha"? raw_area : unit==="sqm"? raw_area/10000 : raw_area*0.404686;
     let areaSqm = unit==="ha"? raw_area*10000 : unit==="sqm"? raw_area : raw_area*4046.86;
     
-    let budget = parseFloat(document.getElementById("budget").value) || 500000;
     let sp = parseFloat(document.getElementById("spacing").value) || 3;
     let wA = parseFloat(document.getElementById("waterAvail").value);
     let pH = parseFloat(document.getElementById("soilPH").value);
-    let el = parseFloat(document.getElementById("elevation").value);
     let mm = parseInt(S.rainfall) || 900;
     let goal = document.getElementById("goal").value;
     let maintLevel = document.getElementById("maintenance").value;
@@ -468,11 +455,10 @@
     let rainfallScore = Math.min(1, mm/2000);
     let soilScore = (S.soil.includes("Clay")||S.soil.includes("Alluvial")) ? 0.85 : (S.soil.includes("Sandy") ? 0.6 : 0.7);
     let waterScore = wA;
-    let elevationScore = el<800 ? 1 : (el<1500 ? 0.8 : 0.5);
     let phScore = getPHScore(pH);
     
     // Update radar chart (only site factors)
-    if(radarChart) { radarChart.data.datasets[0].data = [climateScore, rainfallScore, soilScore, waterScore, elevationScore, phScore]; radarChart.update(); }
+    if(radarChart) { radarChart.data.datasets[0].data = [climateScore, rainfallScore, soilScore, waterScore, phScore]; radarChart.update(); }
     
     // Update cost chart (including amendment)
     if(costChart) { costChart.data.datasets[0].data = [plantingCost, labourCost, maintCostPerTree*totalTrees*5, phAmendmentCost]; costChart.update(); }
@@ -495,7 +481,7 @@
     document.getElementById("heroScore").innerText = (overall*100).toFixed(0)+"%";
     
     // Update health ring and bars (only site factors for visual)
-    let siteOnlyOverall = climateScore*0.25 + rainfallScore*0.2 + soilScore*0.2 + waterScore*0.2 + elevationScore*0.1 + phScore*0.05;
+    let siteOnlyOverall = climateScore*0.25 + rainfallScore*0.25 + soilScore*0.25 + waterScore*0.2 + phScore*0.05;
     document.getElementById("rb-climate").style.width = climateScore*100+"%"; document.getElementById("rv-climate").innerText = (climateScore*100).toFixed(0)+"%";
     document.getElementById("rb-rain").style.width = rainfallScore*100+"%"; document.getElementById("rv-rain").innerText = (rainfallScore*100).toFixed(0)+"%";
     document.getElementById("rb-soil").style.width = soilScore*100+"%"; document.getElementById("rv-soil").innerText = (soilScore*100).toFixed(0)+"%";
@@ -506,7 +492,6 @@
     document.getElementById("ecoBar").style.width = overall*100+"%";
     
     // Factor analysis table (including goal, maintenance, budget, spacing)
-    let budgetScore = Math.min(1, budget / (fiveYrCost || 1));
     let maintScore = maintLevel === "high" ? 1.0 : (maintLevel === "medium" ? 0.7 : 0.4);
     let spacingScore = 1.0;
     if(goal === "timber" && sp < 4) spacingScore = 0.6;
@@ -524,11 +509,9 @@
       {f:"Rainfall", v:S.rainfall, score:rainfallScore, status:rainfallScore>0.6?"ok":"warn"},
       {f:"Soil", v:S.soil, score:soilScore, status:soilScore>0.7?"ok":"warn"},
       {f:"Water", v:wA.toFixed(2), score:waterScore, status:waterScore>0.6?"ok":"warn"},
-      {f:"Elevation", v:el+" m", score:elevationScore, status:elevationScore>0.7?"ok":"warn"},
       {f:"Soil pH", v:pH.toFixed(1), score:phScore, status:phScore>0.8?"ok":(phScore>0.5?"warn":"bad")},
       {f:"Goal Alignment", v:goal, score:goalAlignmentScore, status:goalAlignmentScore>0.7?"ok":"warn"},
       {f:"Maintenance", v:maintLevel, score:maintScore, status:maintScore>0.7?"ok":"warn"},
-      {f:"Budget Adequacy", v:"₹"+budget.toLocaleString(), score:budgetScore, status:budgetScore>0.8?"ok":(budgetScore>0.5?"warn":"bad")},
       {f:"Spacing Suitability", v:sp+" m", score:spacingScore, status:spacingScore>0.8?"ok":"warn"}
     ];
     document.getElementById("analysisBody").innerHTML = rows.map(r => `
@@ -564,7 +547,7 @@
  
 
   function initCharts() {
-    radarChart = new Chart(document.getElementById("radarChart"),{type:"radar",data:{labels:["Climate","Rainfall","Soil","Water","Elevation","pH"],datasets:[{label:"Suitability",data:[0,0,0,0,0,0],backgroundColor:"rgba(61,90,43,0.2)",borderColor:"#3d5a2b"}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{beginAtZero:true,max:1}}}});
+    radarChart = new Chart(document.getElementById("radarChart"),{type:"radar",data:{labels:["Climate","Rainfall","Soil","Water","pH"],datasets:[{label:"Suitability",data:[0,0,0,0,0],backgroundColor:"rgba(61,90,43,0.2)",borderColor:"#3d5a2b"}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{beginAtZero:true,max:1}}}});
     costChart = new Chart(document.getElementById("costChart"),{type:"doughnut",data:{labels:["Sapling + Planting","Labour (5 yr)","Maintenance (5 yr)","Soil Amendment"],datasets:[{data:[0,0,0,0],backgroundColor:["#3d5a2b","#567a40","#a8c97f","#c97a2f"]}]},options:{cutout:"60%"}});
     projChart = new Chart(document.getElementById("projChart"),{type:"line",data:{labels:[0,1,2,3,4,5,6,7,8,9,10],datasets:[{label:"tCO₂",data:[0,0,0,0,0,0,0,0,0,0,0],borderColor:"#3d5a2b",fill:true}]},options:{responsive:true}});
   }
