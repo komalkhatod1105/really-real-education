@@ -48,33 +48,24 @@
 .site-header-inner {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 18px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.brand {
+  padding: 14px 20px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  text-decoration: none;
+  gap: 10px;
+}
+.brand-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 .brand-title {
   font-family: 'Poppins', 'Segoe UI', sans-serif;
   font-size: 1.35rem;
   font-weight: 700;
   color: #1f2933;
-}
-.brand-tagline {
-  font-size: 0.95rem;
-  color: #5b6572;
-  font-weight: 500;
-}
-.brand-tagline a {
-  color: inherit;
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .site-nav {
   display: flex;
@@ -102,6 +93,11 @@
   background: linear-gradient(135deg, rgba(102, 183, 160, 0.9), rgba(102, 125, 183, 0.9));
   color: #ffffff;
   border-color: transparent;
+}
+.site-nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .location-search {
   display: flex;
@@ -148,18 +144,13 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 @media (max-width: 768px) {
-  .site-header-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 14px 16px;
-    gap: 12px;
-  }
-  .site-nav { width: 100%; gap: 8px; }
+  .site-header-inner { padding: 14px 16px; gap: 10px; }
+  .brand-nav-row { flex-wrap: wrap; gap: 10px; }
+  .site-nav { gap: 8px; }
   .site-nav a { padding: 8px 14px; }
   .location-search input { width: 110px; }
 }
 @media (max-width: 480px) {
-  .site-nav { justify-content: flex-start; }
   .site-nav a { font-size: 0.85rem; padding: 8px 12px; }
 }
   
@@ -229,23 +220,24 @@
 <body>
 <header class="site-header">
   <div class="site-header-inner">
-    <a class="brand" href="https://reallyrealeducation.org/index.html">
-      <span class="brand-title">Really Real Education</span>
-      <span class="brand-tagline">An Educational Initiative of <a href="https://jaltediyefoundation.org" target="_blank" style="color:inherit;text-decoration:none;">Jalte Diye Foundation</a></span>
-    </a>
-    <nav class="site-nav">
-      <a href="https://reallyrealeducation.org/index.html">Home</a>
-      <a href="https://reallyrealeducation.org/books.html">Books</a>
-      <a href="https://reallyrealeducation.org/gvan.html" aria-current="page">Gvan</a>
-      <a href="https://reallyrealeducation.org/blog.html">Blogs</a>
-      <a href="https://reallyrealeducation.org/posts.html">Posts</a>
-      <a href="https://reallyrealeducation.org/articles.html">Journals</a>
+    <div class="brand-nav-row">
+      <a class="brand-title" href="https://reallyrealeducation.org/index.html">Really Real Education</a>
+      <nav class="site-nav">
+        <a href="https://reallyrealeducation.org/index.html">Home</a>
+        <a href="https://reallyrealeducation.org/books.html">Books</a>
+        <a href="https://reallyrealeducation.org/gvan.html" aria-current="page">Gvan</a>
+        <a href="https://reallyrealeducation.org/blog.html">Blogs</a>
+        <a href="https://reallyrealeducation.org/posts.html">Posts</a>
+        <a href="https://reallyrealeducation.org/articles.html">Journals</a>
+      </nav>
+    </div>
+    <div class="site-nav-tools">
       <div class="location-search">
         <input type="text" id="locationInput" placeholder="City, village, district" value="New Delhi">
         <button onclick="searchLocation()">📍 Go</button>
       </div>
       <button id="detectBtn" class="site-nav-detect" onclick="detectLocation()">📡 Detect</button>
-    </nav>
+    </div>
   </div>
 </header>
 <div class="hero">
