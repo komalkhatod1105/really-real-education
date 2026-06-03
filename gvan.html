@@ -366,14 +366,8 @@
   let soilData = null;
   let currentZoneId = null;
 
-  function getAgroZone(lat, lon) {
-    if (lat < 6.0 || lat > 38.0 || lon < 68.0 || lon > 98.0) return "north_central_arid_plains"; 
-    if (lon > 87.0 || (lat > 22.0 && lon > 84.0)) return "east_northeast_subtropical";
-    if (lat < 20.0) return (lon < 77.5) ? "western_ghats_coastal" : "south_deccan_plateau";
-    return "north_central_arid_plains";
-  }
-
   async function analyzeSite() {
+    // 1. Fetch updated coordinates
     const lat = parseFloat(document.getElementById('mw-lat').value);
     const lon = parseFloat(document.getElementById('mw-lon').value);
     
@@ -381,23 +375,30 @@
     document.getElementById('mw-results').style.display = 'none';
 
     try {
+      // 2. Fetch databases
       if (!plantData || !soilData) {
         const [pRes, sRes] = await Promise.all([
           fetch('plant data.json'),
           fetch('soil quaility and enhancers.json')
         ]);
         
-        if (!pRes.ok || !sRes.ok) throw new Error("Ensure JSON files are on a local server.");
+        if (!pRes.ok || !sRes.ok) throw new Error("JSON Database files not found.");
         
         plantData = await pRes.json();
         soilData = await sRes.json();
       }
 
-      currentZoneId = getAgroZone(lat, lon);
+      // 3. Get Zone from global gvan.js function
+      if (typeof getAgroZone === "function") {
+        currentZoneId = getAgroZone(lat, lon);
+      } else {
+        throw new Error("Agro-Zone core engine missing. Make sure gvan.js is loaded.");
+      }
+      
       populateUI();
       
     } catch (error) {
-      alert("Error loading data: " + error.message);
+      alert("Error generating blueprint: " + error.message);
       document.getElementById('mw-loading').style.display = 'none';
     }
   }
@@ -411,6 +412,7 @@
 
     document.getElementById('mw-zone-name').innerText = plantRegion.display_name;
 
+    // Render Plants
     let plantsHtml = '';
     const layers = ['canopy', 'tree', 'sub_tree', 'shrub'];
     layers.forEach(layer => {
@@ -422,6 +424,7 @@
     });
     document.getElementById('mw-plants-list').innerHTML = plantsHtml;
 
+    // Render Soil Options
     const soilSelect = document.getElementById('mw-soil-select');
     soilSelect.innerHTML = '';
     soilRegion.dominant_soils.forEach((soil, index) => {
@@ -437,15 +440,19 @@
   function calculateEnhancersAndBudget() {
     const area = parseFloat(document.getElementById('mw-area').value) || 100;
     const ph = parseFloat(document.getElementById('mw-ph').value) || 6.5;
+    
+    // Validate we have data loaded
+    if(!soilData || !currentZoneId) return;
+
     const soilIndex = document.getElementById('mw-soil-select').value;
     const soilRegion = soilData.agro_zones[currentZoneId];
     const selectedSoil = soilRegion.dominant_soils[soilIndex];
     const formula = selectedSoil.enhancer_formula_kg_per_sqm;
 
-    // Fixed Rates (INR)
+    // Standard INR Rates
     const rates = { sapling: 45, excavation: 80, coco: 20, husk: 10, compost: 15, mulch: 15 };
 
-    // Core Miyawaki Math
+    // Miyawaki Math
     const saplings = Math.round(area * 3.5);
     const cocoKg = area * formula.water_retainer_cocopeat;
     const huskKg = area * formula.perforator_rice_husk;
@@ -458,36 +465,34 @@
     let costCompost = compostKg * rates.compost;
     let costMulch = area * rates.mulch;
 
-    // pH Amendment Logic
-    let phAmendmentName = "";
     let costPh = 0;
+    let phAmendmentName = "";
     let phAdviceHtml = "";
 
     if (ph < 5.5) {
-      const limeKg = area * 0.25; // 0.25 kg of lime per sqm
-      costPh = limeKg * 8; // ₹8 per kg for agricultural lime
+      const limeKg = area * 0.25; 
+      costPh = limeKg * 8; 
       phAmendmentName = `Dolomitic Lime (${limeKg.toFixed(1)}kg)`;
-      phAdviceHtml = `<div style="background:#fde8e8; color:#c0392b; padding:8px; border-radius:6px; margin-bottom:8px;">⚠️ <strong>Acidic Soil (pH ${ph}):</strong> Added lime budget to prevent mineral toxicity and stunted roots.</div>`;
+      phAdviceHtml = `<div style="background:#fde8e8; color:#c0392b; padding:8px; border-radius:6px; margin-bottom:8px;">⚠️ <strong>Acidic Soil (pH ${ph}):</strong> Added lime budget.</div>`;
     } else if (ph > 7.5) {
-      const sulphurKg = area * 0.20; // 0.20 kg of sulphur per sqm
-      costPh = sulphurKg * 15; // ₹15 per kg for agricultural sulphur
+      const sulphurKg = area * 0.20; 
+      costPh = sulphurKg * 15; 
       phAmendmentName = `Agri-Sulphur (${sulphurKg.toFixed(1)}kg)`;
-      phAdviceHtml = `<div style="background:#fff3e0; color:#c97a2f; padding:8px; border-radius:6px; margin-bottom:8px;">⚠️ <strong>Alkaline Soil (pH ${ph}):</strong> Added sulphur budget to prevent iron/phosphorus nutrient locking.</div>`;
+      phAdviceHtml = `<div style="background:#fff3e0; color:#c97a2f; padding:8px; border-radius:6px; margin-bottom:8px;">⚠️ <strong>Alkaline Soil (pH ${ph}):</strong> Added sulphur budget.</div>`;
     } else {
-      phAdviceHtml = `<div style="background:#e6f5e8; color:#2d7a3a; padding:8px; border-radius:6px; margin-bottom:8px;">✅ <strong>Optimal pH (${ph}):</strong> No special pH amendments required.</div>`;
+      phAdviceHtml = `<div style="background:#e6f5e8; color:#2d7a3a; padding:8px; border-radius:6px; margin-bottom:8px;">✅ <strong>Optimal pH (${ph}):</strong> No amendments needed.</div>`;
     }
     
     const totalCost = costSaplings + costExcavation + costCoco + costHusk + costCompost + costMulch + costPh;
 
-    // Render Breakdown Table
     let budgetHtml = `
       ${phAdviceHtml}
       <table style="width:100%; border-collapse: collapse; margin-bottom: 10px;">
         <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>Saplings (x${saplings})</strong></td><td style="text-align:right">₹${costSaplings.toLocaleString()}</td></tr>
         <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>1m Trench Excavation</strong></td><td style="text-align:right">₹${costExcavation.toLocaleString()}</td></tr>
-        <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>Cocopeat (${cocoKg}kg)</strong></td><td style="text-align:right">₹${costCoco.toLocaleString()}</td></tr>
-        <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>Rice Husk (${huskKg}kg)</strong></td><td style="text-align:right">₹${costHusk.toLocaleString()}</td></tr>
-        <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>Compost (${compostKg}kg)</strong></td><td style="text-align:right">₹${costCompost.toLocaleString()}</td></tr>
+        <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>Cocopeat (${cocoKg.toFixed(1)}kg)</strong></td><td style="text-align:right">₹${costCoco.toLocaleString()}</td></tr>
+        <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>Rice Husk (${huskKg.toFixed(1)}kg)</strong></td><td style="text-align:right">₹${costHusk.toLocaleString()}</td></tr>
+        <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>Compost (${compostKg.toFixed(1)}kg)</strong></td><td style="text-align:right">₹${costCompost.toLocaleString()}</td></tr>
         <tr style="border-bottom: 1px solid #ddd;"><td style="padding:4px 0;"><strong>Surface Mulch</strong></td><td style="text-align:right">₹${costMulch.toLocaleString()}</td></tr>
     `;
     
@@ -762,56 +767,7 @@
 
 </div>
 
-<script>
-  function simulateForestGrowth() {
-    const year = parseInt(document.getElementById('mw-year-slider').value);
-    document.getElementById('mw-year-label').innerText = 'Year ' + year;
-
-    // Fetch area from main widget, default to 100 if not found
-    const areaInput = document.getElementById('mw-area');
-    const area = areaInput ? parseFloat(areaInput.value) || 100 : 100;
-    const saplings = Math.round(area * 3.5);
-
-    const taskList = document.getElementById('mw-maintenance-tasks');
-    const statusList = document.getElementById('mw-eco-status');
-    const co2Output = document.getElementById('mw-co2-output');
-
-    // CO2 Math: A growing tree sequesters roughly 15kg/year, compounding slightly as biomass increases.
-    // Early years have lower sequestration.
-    let co2PerTree = 0;
-    if (year === 1) co2PerTree = 2;
-    else if (year === 2) co2PerTree = 6;
-    else if (year === 3) co2PerTree = 15;
-    else co2PerTree = 15 + ((year - 3) * 18); // Mature growth
-    
-    const totalCO2 = saplings * co2PerTree;
-    
-    // Format CO2 text
-    if (totalCO2 > 1000) {
-      co2Output.innerText = (totalCO2 / 1000).toFixed(2) + ' Tons';
-    } else {
-      co2Output.innerText = totalCO2.toLocaleString() + ' kg';
-    }
-
-    // Dynamic Logic for Years
-    if (year === 1) {
-      taskList.innerHTML = `<li>Water 4L per sqm daily.</li><li>Manual weeding monthly (do not uproot, cut and drop as mulch).</li><li>Check support sticks.</li>`;
-      statusList.innerHTML = `<li>Average height: 1.5 - 2 meters.</li><li>Roots establishing in perforated soil.</li><li>Vulnerable to pests and grazing.</li>`;
-    } else if (year === 2) {
-      taskList.innerHTML = `<li>Watering reduced to 2L per sqm daily.</li><li>Bi-monthly check for invasive vines.</li><li>Remove support sticks if stems are thick.</li>`;
-      statusList.innerHTML = `<li>Average height: 3 - 4 meters.</li><li>Canopy is beginning to touch and merge.</li><li>Local birds and insects start nesting.</li>`;
-    } else if (year === 3) {
-      taskList.innerHTML = `<li><strong>Zero maintenance required.</strong></li><li>Stop watering (unless extreme drought).</li><li>Do not enter or walk inside the patch.</li>`;
-      statusList.innerHTML = `<li>Average height: 5+ meters.</li><li>Canopy is completely closed.</li><li>No sunlight reaches the floor (weeds die naturally).</li>`;
-    } else {
-      taskList.innerHTML = `<li><strong>100% Self-Sustaining.</strong></li><li>Monitor perimeter fencing.</li><li>Enjoy the local biodiversity.</li>`;
-      statusList.innerHTML = `<li>Distinct 4-tier canopy fully established.</li><li>Local ambient temperature drops by 2°C to 4°C.</li><li>Heavy leaf drop creates natural, permanent compost layer.</li>`;
-    }
-  }
-
-  // Initialize on load
-  setTimeout(simulateForestGrowth, 100);
-</script>
+<!-- <script></script> -->
 
 
     <!-- Material & Water Requirement -->
