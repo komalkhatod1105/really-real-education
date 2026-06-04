@@ -519,22 +519,9 @@ let S = { lat:28.6139, lon:77.2090, soil:"Clay-Loam", rainfall:"900mm", climate:
     let goal = document.getElementById("goal").value;
     let maintLevel = document.getElementById("maintenance").value;
     
+    // Kept for internal logic calculations downstream
     let totalSaplings = Math.round(areaSqm * 3.5);
-    let organicCompost = areaSqm * 0.20;
-    let riceHusk = areaSqm * 0.10;
-    let cocoPeat = areaSqm * 0.10;
-    let surfaceMulch = areaSqm * 0.08;
-    let irrigationWater = totalSaplings * 4.5 * 30;
     let phAmendment = getPHAmendment(pH, areaSqm);
-    
-    document.getElementById("totalSaplings").innerText = totalSaplings.toLocaleString();
-    document.getElementById("organicCompost").innerText = organicCompost.toFixed(1) + " m³";
-    document.getElementById("riceHusk").innerText = riceHusk.toFixed(1) + " m³";
-    document.getElementById("cocoPeat").innerText = cocoPeat.toFixed(1) + " m³";
-    document.getElementById("surfaceMulch").innerText = surfaceMulch.toFixed(1) + " m³";
-    document.getElementById("irrigationWater").innerText = irrigationWater.toLocaleString() + " L";
-    if(phAmendment.kg > 0) { document.getElementById("phAmendmentRow").style.display = "flex"; document.getElementById("phAmendment").innerHTML = phAmendment.desc; } 
-    else { document.getElementById("phAmendmentRow").style.display = "none"; }
     
     let multipliers = getGoalMultipliers(goal);
     let treesPerHa = Math.round(10000/(sp*sp));
@@ -551,26 +538,21 @@ let S = { lat:28.6139, lon:77.2090, soil:"Clay-Loam", rainfall:"900mm", climate:
     let elevationScore = el<800 ? 1 : (el<1500 ? 0.8 : 0.5);
     let phScore = getPHScore(pH);
     
-   
-    
     let kgPerTree = S.climate.includes("Tropical") ? 18 : 12;
     let carbonPerYr = ((totalTrees * kgPerTree) / 1000).toFixed(1);
     let projData = [...Array(11).keys()].map(y => +((totalTrees * kgPerTree * y * (1 + y*0.035))/1000).toFixed(1));
     if(projChart) { projChart.data.datasets[0].data = projData; projChart.update(); }
     
-   
     let overall = computeSuccessRate();
     document.getElementById("mSuccess").innerText = (overall*100).toFixed(0)+"%";
     
+    // REMOVED: UI element updates for material lists, updateSpeciesRec(), and updateSuggestions()
     
- 
-    updateSpeciesRec();
-    updateSuggestions();
     if(polyClosed) renderPlantation();
-  }
+}
   
-  function updateAllUI() {
-  calc();
+function updateAllUI() {
+    calc();
 }
   // ========== FIELD DRAWING ==========
   function setDrawMode(mode) { drawModeActive=mode; document.getElementById("drawModeBtn")?.classList.toggle("active",mode); }
