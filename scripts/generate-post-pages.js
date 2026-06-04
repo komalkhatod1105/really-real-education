@@ -82,6 +82,7 @@ function renderPostPage(post) {
                     <a href="../books.html">Books</a>
                     <a href="../blog.html">Blogs</a>
                     <a href="../posts.html" aria-current="page">Posts</a>
+                  <a href="../founder/">Founder</a>
                     <a href="../articles.html">Journals</a>
                 </nav>
             </div>
