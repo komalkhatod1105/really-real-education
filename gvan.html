@@ -130,20 +130,20 @@
     <h1>Plan <em>forests</em>,<br>restore earth.</h1>
     <div class="hero-tools">
       <div class="location-search"><input type="text" id="locationInput" placeholder="City, village, district" value="New Delhi"><button onclick="searchLocation()">📍 Go</button></div>
-      <button id="detectBtn" class="site-nav-detect" onclick="detectLocation()">📡 Auto-detect</button>
-      <button class="btn-outline" onclick="document.getElementById('field-section').scrollIntoView({behavior:'smooth'})">✏️ Field Designer</button>
+      <button id="detectBtn" class="site-nav-detect" onclick="detectLocation()">Auto-detect</button>
+      <button class="btn-outline" onclick="document.getElementById('field-section').scrollIntoView({behavior:'smooth'})">Field Designer</button>
     </div>
     <div class="loc-status"><span id="locDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#aaa;margin-right:6px;"></span><span id="locStatus">📍 Using default India • click detect or search</span></div>
   </div>
 </div>
 <main>
   <div class="section" id="map-section">
-    <div class="section-header"><h2>🗺️ Live Site Map</h2><span>Search / detect updates coordinates</span></div>
+    <div class="section-header"><h2>Live Site Map</h2><span>Search / detect updates coordinates</span></div>
     <div class="card"><div class="card-header">📍 Location & Boundaries</div><div id="map" style="height:320px"></div></div>
   </div>
 
   <div class="miyawaki-card">
-    <h2 style="font-family:'Playfair Display'; margin-top:0;">🌿 Miyawaki Site Analyzer</h2>
+    <h2 style="font-family:'Playfair Display'; margin-top:0;">Miyawaki Site Analyzer</h2>
     <div class="input-grid">
       <div><label>Latitude</label><input type="number" id="mw-lat" value="28.6139" step="any" readonly></div>
       <div><label>Longitude</label><input type="number" id="mw-lon" value="77.2090" step="any" readonly></div>
@@ -176,24 +176,24 @@
 
   <!-- MERGED RESOURCE ESTIMATOR (Fencing + Material + Water) - shape complexity removed -->
   <div class="resource-card">
-    <h3 style="font-family:'Playfair Display';">📦 Site Preparation & Resource Estimator</h3>
+    <h3 style="font-family:'Playfair Display';">Site Preparation & Resource Estimator</h3>
     <div class="resource-grid">
       <!-- Left column: Area & Fencing (simplified) -->
       <div class="sub-card">
         <div style="display: flex; gap: 12px; margin: 0 0 16px 0; flex-wrap: wrap;">
-          <button onclick="toggleGeometryMode('estimate')" id="btn-estimate" style="background:#2c6e2a; color:white; border:none; border-radius:40px; padding:6px 20px;">🔮 Estimate from Shape</button>
-          <button onclick="toggleGeometryMode('manual')" id="btn-manual" style="background:transparent; border:1px solid #2c6e2a; border-radius:40px; padding:6px 20px; color:#2c6e2a;">✏️ Enter Exact Perimeter</button>
+          <button onclick="toggleGeometryMode('estimate')" id="btn-estimate" style="background:#2c6e2a; color:white; border:none; border-radius:40px; padding:6px 20px;">Estimate from Shape</button>
+          <button onclick="toggleGeometryMode('manual')" id="btn-manual" style="background:transparent; border:1px solid #2c6e2a; border-radius:40px; padding:6px 20px; color:#2c6e2a;">Enter Exact Perimeter</button>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div><label>🌾 Land Area (sq m)</label><input type="number" id="mw-area-input" value="120" oninput="syncAreaAndRecalc()"></div>
-          <div id="manual-perimeter-div" style="display:none;"><label>📏 Known Perimeter (m)</label><input type="number" id="mw-perimeter-input" value="50" oninput="calculateIrregularGeometry()"></div>
+          <div><label>Land Area (sq m)</label><input type="number" id="mw-area-input" value="120" oninput="syncAreaAndRecalc()"></div>
+          <div id="manual-perimeter-div" style="display:none;"><label>Known Perimeter (m)</label><input type="number" id="mw-perimeter-input" value="50" oninput="calculateIrregularGeometry()"></div>
         </div>
         <!-- Shape complexity dropdown removed -->
         <div style="display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap;">
-          <div class="metric-pill" style="flex:1;"><div style="font-size:0.7rem;">📏 Fencing Boundary</div><div id="mw-perimeter" style="font-size: 1.5rem; font-weight: 800;">--</div><div>linear meters</div></div>
-          <div class="metric-pill" style="flex:1;"><div style="font-size:0.7rem;">🛡️ Chainlink Cost</div><div id="mw-fencing-cost" style="font-size: 1.5rem; font-weight: 800;">--</div><div>₹ (material+install)</div></div>
+          <div class="metric-pill" style="flex:1;"><div style="font-size:0.7rem;">Fencing Boundary</div><div id="mw-perimeter" style="font-size: 1.5rem; font-weight: 800;">--</div><div>linear meters</div></div>
+          <div class="metric-pill" style="flex:1;"><div style="font-size:0.7rem;">Chainlink Cost</div><div id="mw-fencing-cost" style="font-size: 1.5rem; font-weight: 800;">--</div><div>₹ (material+install)</div></div>
         </div>
-        <div style="margin-top: 12px; font-size: 0.7rem; text-align: center;">💡 Add 10–15% extra for irregular boundaries.</div>
+        <div style="margin-top: 12px; font-size: 0.7rem; text-align: center;">Add 10–15% extra for irregular boundaries.</div>
       </div>
 
       <!-- Right column: Material Budget + Water Requirement -->
@@ -211,7 +211,7 @@
 
   <!-- Long-term Impact (unchanged) -->
   <div style="background: white; border:1px solid #e2e0d6; border-radius:28px; padding:1.5rem; margin-bottom:2rem;">
-    <h3 style="font-family:'Playfair Display';">🌍 Long-term Impact & Maintenance</h3>
+    <h3 style="font-family:'Playfair Display';">Long-term Impact & Maintenance</h3>
     <div style="margin: 20px 0;">
       <label>Forest Age (years): <span id="mw-year-label" style="font-weight:800;">Year 1</span></label>
       <input type="range" id="mw-year-slider" min="1" max="10" value="1" oninput="simulateForestGrowth()" style="width:100%; margin: 10px 0;">
@@ -227,18 +227,18 @@
       </div>
     </div>
     <div class="impact-timeline" style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
-      <div class="impact-milestone" style="flex:1; background:white; border-radius:20px; padding:0.6rem; text-align:center; font-size:0.75rem; border:1px solid #ece8e0;">Year 1-2<br>🌱 Establishment</div>
-      <div class="impact-milestone" style="flex:1; background:white; border-radius:20px; padding:0.6rem; text-align:center; font-size:0.75rem; border:1px solid #ece8e0;">Year 3-5<br>🌳 Canopy closure</div>
-      <div class="impact-milestone" style="flex:1; background:white; border-radius:20px; padding:0.6rem; text-align:center; font-size:0.75rem; border:1px solid #ece8e0;">Year 6-10<br>🦜 Biodiversity hotspot</div>
+      <div class="impact-milestone" style="flex:1; background:white; border-radius:20px; padding:0.6rem; text-align:center; font-size:0.75rem; border:1px solid #ece8e0;">Year 1-2<br>Establishment</div>
+      <div class="impact-milestone" style="flex:1; background:white; border-radius:20px; padding:0.6rem; text-align:center; font-size:0.75rem; border:1px solid #ece8e0;">Year 3-5<br>Canopy closure</div>
+      <div class="impact-milestone" style="flex:1; background:white; border-radius:20px; padding:0.6rem; text-align:center; font-size:0.75rem; border:1px solid #ece8e0;">Year 6-10<br>Biodiversity hotspot</div>
     </div>
   </div>
 
   <!-- Field Polygon & Plantation Simulator (unchanged) -->
   <div class="section" id="field-section">
-    <div class="section-header"><h2>✏️ Field Polygon & Plantation Layout</h2><span>Draw boundary → Miyawaki density planting</span></div>
+    <div class="section-header"><h2>Field Polygon & Plantation Layout</h2><span>Draw boundary → Miyawaki density planting</span></div>
     <div class="grid-2">
-      <div class="card"><div class="card-header">🗺️ Draw Field</div><div class="card-body" style="padding:1rem;"><canvas id="fieldCanvas" width="600" height="340"></canvas><div class="canvas-scale">📐 Grid squares = 30px × 30px → 3m × 3m &nbsp; | &nbsp; 📏 Scale: 10px ≈ 1m</div><div style="display:flex; gap:0.5rem; margin-top:0.6rem; flex-wrap:wrap;"><button class="poly-btn" id="drawModeBtn" onclick="setDrawMode(true)">✏️ Draw</button><button class="poly-btn" onclick="clearPolygon()">🗑 Clear</button><button class="poly-btn" onclick="closePolygon()">Simulate</button><button class="poly-btn" onclick="loadSampleField()">📐 Sample Field</button></div><div class="spacing-slider" style="margin-top:0.8rem; display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;"><span>🌿 Miyawaki density (saplings/m²):</span><input type="range" id="densitySlider" min="2" max="6" step="1" value="4" oninput="updateDensityAndSimulate()"><span id="densityValue">4 saplings/m²</span></div><div id="polyInfo" style="font-size:0.7rem; margin-top:0.5rem;">Click points, close near orange start → Simulate (dense Miyawaki forest)</div></div></div>
-      <div class="card"><div class="card-header">🌳 Plantation Simulator</div><div class="card-body" style="padding:1rem;"><canvas id="plantationCanvas" width="600" height="340"></canvas><div style="margin-top:0.6rem; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;"><div>Trees (saplings): <strong id="polyTrees">—</strong></div><div>Area: <strong id="polyArea">—</strong> m²</div><div>Canopy coverage: <strong id="polyCoverage">—</strong>%</div></div></div></div>
+      <div class="card"><div class="card-header">Draw Field</div><div class="card-body" style="padding:1rem;"><canvas id="fieldCanvas" width="600" height="340"></canvas><div class="canvas-scale">Grid squares = 30px × 30px → 3m × 3m &nbsp; | &nbsp; Scale: 10px ≈ 1m</div><div style="display:flex; gap:0.5rem; margin-top:0.6rem; flex-wrap:wrap;"><button class="poly-btn" id="drawModeBtn" onclick="setDrawMode(true)">✏️ Draw</button><button class="poly-btn" onclick="clearPolygon()">🗑 Clear</button><button class="poly-btn" onclick="closePolygon()">Simulate</button><button class="poly-btn" onclick="loadSampleField()">📐 Sample Field</button></div><div class="spacing-slider" style="margin-top:0.8rem; display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;"><span>🌿 Miyawaki density (saplings/m²):</span><input type="range" id="densitySlider" min="2" max="6" step="1" value="4" oninput="updateDensityAndSimulate()"><span id="densityValue">4 saplings/m²</span></div><div id="polyInfo" style="font-size:0.7rem; margin-top:0.5rem;">Click points, close near orange start → Simulate (dense Miyawaki forest)</div></div></div>
+      <div class="card"><div class="card-header">Plantation Simulator</div><div class="card-body" style="padding:1rem;"><canvas id="plantationCanvas" width="600" height="340"></canvas><div style="margin-top:0.6rem; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;"><div>Trees (saplings): <strong id="polyTrees">—</strong></div><div>Area: <strong id="polyArea">—</strong> m²</div><div>Canopy coverage: <strong id="polyCoverage">—</strong>%</div></div></div></div>
     </div>
   </div>
 
