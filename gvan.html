@@ -341,16 +341,16 @@
     // Build HTML
     const formatINR = (val) => '₹' + Math.round(val).toLocaleString();
     let html = `
-      <div class="cost-item"><span>🌱 Saplings (${Math.round(saplings)} × ₹45)</span><span>${formatINR(saplingCost)}</span></div>
-      <div class="cost-item"><span>⛏️ Site prep (${area} m² × ₹80)</span><span>${formatINR(sitePrep)}</span></div>
-      <div class="cost-item"><span>🥥 Cocopeat (${(area*cocopeatKg).toFixed(1)} kg × ₹20)</span><span>${formatINR(cocopeatCost)}</span></div>
-      <div class="cost-item"><span>🌾 Rice husk (${(area*riceHuskKg).toFixed(1)} kg × ₹10)</span><span>${formatINR(riceHuskCost)}</span></div>
-      <div class="cost-item"><span>🍂 Organic compost (${(area*compostKg).toFixed(1)} kg × ₹15)</span><span>${formatINR(compostCost)}</span></div>`;
+      <div class="cost-item"><span>Saplings (${Math.round(saplings)} × ₹45)</span><span>${formatINR(saplingCost)}</span></div>
+      <div class="cost-item"><span>Site prep (${area} m² × ₹80)</span><span>${formatINR(sitePrep)}</span></div>
+      <div class="cost-item"><span>Cocopeat (${(area*cocopeatKg).toFixed(1)} kg × ₹20)</span><span>${formatINR(cocopeatCost)}</span></div>
+      <div class="cost-item"><span>Rice husk (${(area*riceHuskKg).toFixed(1)} kg × ₹10)</span><span>${formatINR(riceHuskCost)}</span></div>
+      <div class="cost-item"><span>Organic compost (${(area*compostKg).toFixed(1)} kg × ₹15)</span><span>${formatINR(compostCost)}</span></div>`;
     if (pHAmendmentCost > 0) html += `<div class="cost-item"><span>⚗️ pH amendment (${pH<5.5?'lime':'sulfur'})</span><span>${formatINR(pHAmendmentCost)}</span></div>`;
-    html += `<div class="cost-item"><span>🔒 Fencing (${perimeter} m × ₹150/m)</span><span>${formatINR(fencingCost)}</span></div>
-             <div class="cost-item"><span>💧 Water (2 years, ${Math.round(totalWaterL/1000)} kL × ₹5)</span><span>${formatINR(waterCost)}</span></div>`;
+    html += `<div class="cost-item"><span>Fencing (${perimeter} m × ₹150/m)</span><span>${formatINR(fencingCost)}</span></div>
+             <div class="cost-item"><span>Water (2 years, ${Math.round(totalWaterL/1000)} kL × ₹5)</span><span>${formatINR(waterCost)}</span></div>`;
     document.getElementById('costBreakdownList').innerHTML = html;
-    document.getElementById('breakdownTotal').innerHTML = `<span>🏷️ TOTAL ESTIMATED BUDGET</span><span>${formatINR(total)}</span>`;
+    document.getElementById('breakdownTotal').innerHTML = `<span>TOTAL ESTIMATED BUDGET</span><span>${formatINR(total)}</span>`;
     // Also update the summary total cost pill for consistency
     const totalElem = document.getElementById('mw-total-cost');
     if (totalElem) totalElem.innerText = formatINR(total);
