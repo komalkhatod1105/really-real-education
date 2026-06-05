@@ -59,8 +59,9 @@
     .water-detail { font-size: 0.8rem; margin-top: 8px; color: var(--blue); }
     .layer-stats { background: #eef3e9; border-radius: 20px; padding: 0.8rem; margin-top: 0.5rem; font-size: 0.75rem; }
     .budget-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; margin-top: 8px; }
-    .budget-table td { padding: 6px 4px; border-bottom: 1px solid #e2e0d6; }
-    .budget-table td:last-child { text-align: right; font-weight: 500; }
+    .budget-table td { padding: 6px 4px; border-bottom: 1px solid #e2e0d6; vertical-align: top; }
+    .budget-table td:first-child { text-align: left; font-weight: 500; }
+    .budget-table td:last-child { text-align: right; font-weight: 600; }
     .total-budget { font-size: 1.2rem; font-weight: 800; margin-top: 12px; text-align: right; color: #2c6e2a; border-top: 2px solid #d6dccc; padding-top: 8px; }
     #fieldCanvas, #plantationCanvas { width: 100%; height: 340px; background: #fefef8; border-radius: 20px; cursor: crosshair; border: 1px solid #d6dccc; display: block; }
     .poly-btn { font-size: 0.75rem; padding: 0.3rem 0.9rem; border-radius: 999px; border: 1px solid #d6dccc; background: white; cursor: pointer; }
@@ -124,18 +125,52 @@
   
   function analyzeSite(){ document.getElementById("mw-loading").style.display="block"; document.getElementById("mw-results").style.display="none"; setTimeout(()=>{ let lat=parseFloat(document.getElementById("mw-lat").value), lon=parseFloat(document.getElementById("mw-lon").value); currentZoneId=getAgroZone(lat,lon); let plantRegion=plantData.regions[currentZoneId], soilRegion=soilData.agro_zones[currentZoneId]; if(!plantRegion||!soilRegion){ toast("Region data missing"); document.getElementById("mw-loading").style.display="none"; return; } document.getElementById("mw-zone-name").innerText=plantRegion.display_name; let sel=document.getElementById("mw-soil-select"); sel.innerHTML=""; soilRegion.dominant_soils.forEach((s,i)=>{ let opt=document.createElement("option"); opt.value=i; opt.text=s.soil_name; sel.appendChild(opt); }); sel.onchange=()=>{ updateSpeciesBySoil(); updateFullBudget(); }; updateSpeciesBySoil(); document.getElementById("mw-results").style.display="block"; updateFullBudget(); document.getElementById("mw-loading").style.display="none"; },100); }
   function getCurrentSoilEnhancer(){ let idx=parseInt(document.getElementById("mw-soil-select")?.value||0,10); let zone=soilData.agro_zones[currentZoneId]; return zone?.dominant_soils[idx]||null; }
-  function updateFullBudget(){ let area=parseFloat(document.getElementById("mw-area").value)||parseFloat(document.getElementById("mw-area-input").value)||100; let density=currentDensity, ph=parseFloat(document.getElementById("mw-ph").value)||6.5; let soilEnh=getCurrentSoilEnhancer(); if(!soilEnh){ document.getElementById("mw-budget-list").innerHTML="<div>Select soil to view budget breakdown</div>"; return; } let f=soilEnh.enhancer_formula_kg_per_sqm; let saplings=Math.round(area*density); let saplingCost=saplings*45; let cocopeatKg=area*f.water_retainer_cocopeat, cocopeatCost=cocopeatKg*20; let riceHuskKg=area*f.perforator_rice_husk, riceHuskCost=riceHuskKg*10; let compostKg=area*f.organic_compost, compostCost=compostKg*15; let sitePrepCost=area*80; let plantingMulch=area*15; let phCost=0; if(ph<5.5) phCost=area*0.25*8; else if(ph>7.5) phCost=area*0.2*15; let specialAddCost=area*5; let fencingText=document.getElementById("mw-fencing-cost")?.innerText||"₹0"; let fencingCost=parseInt(fencingText.replace(/[^0-9]/g,''))||0; let waterCost=computeWaterCostTwoYears(area); let totalCost=saplingCost+cocopeatCost+riceHuskCost+compostCost+sitePrepCost+plantingMulch+phCost+specialAddCost+fencingCost+waterCost; let budgetHtml=`<table class="budget-table"><table><td>Saplings (${saplings} nos @ ₹45)</td><td>₹${saplingCost.toLocaleString()}</td></tr>
+  
+  // Helper to get pH amendment recommendation text
+  function getPhAmendmentText(ph) {
+    if (ph < 5.5) return "(Lime / Dolomite / Rock phosphate)";
+    if (ph > 7.5) return "(Gypsum / Sulfur / Organic matter)";
+    return "(None needed, optimal range)";
+  }
+  
+  function updateFullBudget(){ 
+    let area=parseFloat(document.getElementById("mw-area").value)||parseFloat(document.getElementById("mw-area-input").value)||100; 
+    let density=currentDensity, ph=parseFloat(document.getElementById("mw-ph").value)||6.5; 
+    let soilEnh=getCurrentSoilEnhancer(); 
+    if(!soilEnh){ document.getElementById("mw-budget-list").innerHTML="<div>Select soil to view budget breakdown</div>"; return; } 
+    let f=soilEnh.enhancer_formula_kg_per_sqm; 
+    let saplings=Math.round(area*density); 
+    let saplingCost=saplings*45; 
+    let cocopeatKg=area*f.water_retainer_cocopeat, cocopeatCost=cocopeatKg*20; 
+    let riceHuskKg=area*f.perforator_rice_husk, riceHuskCost=riceHuskKg*10; 
+    let compostKg=area*f.organic_compost, compostCost=compostKg*15; 
+    let sitePrepCost=area*80; 
+    let plantingMulch=area*15; 
+    let phCost=0; 
+    if(ph<5.5) phCost=area*0.25*8; 
+    else if(ph>7.5) phCost=area*0.2*15; 
+    let specialAddCost=area*5; 
+    let fencingText=document.getElementById("mw-fencing-cost")?.innerText||"₹0"; 
+    let fencingCost=parseInt(fencingText.replace(/[^0-9]/g,''))||0; 
+    let waterCost=computeWaterCostTwoYears(area); 
+    let totalCost=saplingCost+cocopeatCost+riceHuskCost+compostCost+sitePrepCost+plantingMulch+phCost+specialAddCost+fencingCost+waterCost;
+    let phAmendmentText = getPhAmendmentText(ph);
+    let budgetHtml=`<table class="budget-table">
+      <tr><td>Saplings (${saplings} nos @ ₹45)</td><td>₹${saplingCost.toLocaleString()}</td></tr>
       <tr><td>Cocopeat (${cocopeatKg.toFixed(1)} kg @ ₹20)</td><td>₹${cocopeatCost.toLocaleString()}</td></tr>
       <tr><td>Rice husk (${riceHuskKg.toFixed(1)} kg @ ₹10)</td><td>₹${riceHuskCost.toLocaleString()}</td></tr>
       <tr><td>Compost (${compostKg.toFixed(1)} kg @ ₹15)</td><td>₹${compostCost.toLocaleString()}</td></tr>
       <tr><td>Site preparation</td><td>₹${sitePrepCost.toLocaleString()}</td></tr>
       <tr><td>Planting + mulching</td><td>₹${plantingMulch.toLocaleString()}</td></tr>
-      <tr><td>pH amendment</td><td>₹${phCost.toLocaleString()}</td></tr>
-      <tr><td>Special additives</td><td>₹${specialAddCost.toLocaleString()}</td></tr>
-      <tr><td>Chainlink fencing</td><td>₹${fencingCost.toLocaleString()}</td></tr>
+      <tr><td>pH amendment ${phAmendmentText}</td><td>₹${phCost.toLocaleString()}</td></tr>
+      <tr><td>Special additives (bio-stimulants)</td><td>₹${specialAddCost.toLocaleString()}</td></tr>
+      <tr><td>Chainlink fencing (material+install)</td><td>₹${fencingCost.toLocaleString()}</td></tr>
       <tr><td>Water (2‑year establishment)</td><td>₹${waterCost.toLocaleString()}</td></tr>
     </table>
-    <div class="total-budget">TOTAL: ₹${totalCost.toLocaleString()}</div>`; document.getElementById("mw-budget-list").innerHTML=budgetHtml; }
+    <div class="total-budget">TOTAL: ₹${totalCost.toLocaleString()}</div>`; 
+    document.getElementById("mw-budget-list").innerHTML=budgetHtml; 
+  }
+  
   function computeWaterCostTwoYears(area){ let lat=parseFloat(document.getElementById("mw-lat").value)||28.6; let climate=getAgroZone(lat,0); let baseET=4; if(climate==="western_ghats_coastal") baseET=3.0; else if(climate==="east_northeast_subtropical") baseET=3.5; else if(climate==="south_deccan_plateau") baseET=4.2; else baseET=4.5; let soilEnh=getCurrentSoilEnhancer(); let soilFactor=1.0; if(soilEnh){ let st=soilEnh.soil_name.toLowerCase(); if(st.includes("sandy")) soilFactor=1.3; else if(st.includes("clay")) soilFactor=0.8; else if(st.includes("laterite")||st.includes("acidic")) soilFactor=1.1; } let dailyWaterL=area*baseET*soilFactor; let totalWaterTwoYearsL=dailyWaterL*365*2; let cost=(totalWaterTwoYearsL/1000)*5; return Math.round(cost); }
   function updateWaterRequirement(){ let area=parseFloat(document.getElementById("mw-area").value)||100, lat=parseFloat(document.getElementById("mw-lat").value)||28.6, climate=getAgroZone(lat,0); let baseET=4; if(climate==="western_ghats_coastal") baseET=3.0; else if(climate==="east_northeast_subtropical") baseET=3.5; else if(climate==="south_deccan_plateau") baseET=4.2; else baseET=4.5; let soilEnh=getCurrentSoilEnhancer(), soilFactor=1.0; if(soilEnh){ let st=soilEnh.soil_name.toLowerCase(); if(st.includes("sandy")) soilFactor=1.3; else if(st.includes("clay")) soilFactor=0.8; else if(st.includes("laterite")||st.includes("acidic")) soilFactor=1.1; } let dailyWaterL=area*baseET*soilFactor, totalTwoYearsL=dailyWaterL*365*2, waterCost=Math.round((totalTwoYearsL/1000)*5); document.getElementById("water-requirement").innerHTML=`<div>Daily water need: <strong>${Math.round(dailyWaterL)} L/day</strong></div><div>Weekly: ${Math.round(dailyWaterL*7)} L/week</div><div>Monthly: ${Math.round(dailyWaterL*30)} L/month</div>`; document.getElementById("water-detail").innerHTML=`<div>Total water for 2‑year establishment: <strong>${Math.round(totalTwoYearsL/1000)} m³</strong> (approx. ₹${waterCost.toLocaleString()})</div><div style="font-size:0.7rem;">Based on climate zone, soil type, and daily irrigation for 2 years.</div>`; updateFullBudget(); }
   function initMap(){ map=L.map("map").setView([currentCoords.lat,currentCoords.lng],12); L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png").addTo(map); marker=L.marker([currentCoords.lat,currentCoords.lng]).addTo(map); map.on("click",(e)=>{ currentCoords=e.latlng; marker.setLatLng(currentCoords); updateCoordInputs(); toast("Coordinates updated"); if(document.getElementById("mw-results").style.display==="block") analyzeSite(); }); }
